@@ -1,33 +1,88 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: "API Reference"
+description: "Complete reference for the DynamoPDF API"
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Welcome to the DynamoPDF API
 
-## Welcome
+The DynamoPDF API is a comprehensive PDF generation service that allows you to create, manage, and generate PDF documents from templates with dynamic data binding. Our API provides powerful template management with secure file storage.
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+## Key Features
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+<CardGroup cols={2}>
+  <Card title="PDF Generation" icon="file-pdf" href="/api-reference/endpoint/generate-pdf">
+    Generate PDFs from templates with dynamic data binding and secure cloud storage
+  </Card>
+  <Card title="Template Management" icon="file-pen" href="/api-reference/endpoint/templates">
+    Full CRUD operations for managing PDF templates with validation and versioning
+  </Card>
+  <Card title="File Storage" icon="folder" href="/api-reference/endpoint/file-storage">
+    Secure cloud storage for generated PDFs with time-limited download URLs
+  </Card>
+  <Card title="Template Preview" icon="eye" href="/api-reference/endpoint/template-preview">
+    Preview templates as images and validate template structures
+  </Card>
+</CardGroup>
 
-## Authentication
+## Quick Start
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+### 1. Get Your API Key
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+First, create an API key in the [Developer Portal](https://app.dynamopdf.com/developer):
+
+### 2. Create a Template
+
+Use DynamoPDF's drag and drop editor to create a pdf template.
+
+### 3. Generate a PDF
+
+```bash
+curl -X POST "https://api.dynamopdf.com/api/generate-pdf" \
+  -H "X-API-Key: dk_live_your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "templateId": "template_123456789",
+    "data": {
+      "invoiceNumber": "INV-2024-001",
+      "customerName": "John Doe",
+      "amount": 1250.00
+    },
+    "filename": "invoice_2024_001.pdf"
+  }'
 ```
+
+## Base URL
+
+All API requests should be made to:
+
+```
+https://api.dynamopdf.com
+```
+
+## Rate Limiting
+
+API endpoints have different rate limits based on their computational requirements:
+
+| Endpoint Type | Rate Limit | Time Window |
+|---------------|------------|-------------|
+| Template Management | 100 requests | 1 minute |
+| PDF Generation | 10 requests | 1 minute |
+
+## Use Cases
+
+### Invoice Generation
+Generate professional invoices with dynamic customer data, line items, and branding.
+
+### Report Creation
+Create data-driven reports with charts, tables, and formatted content.
+
+### Certificate Generation
+Batch generate certificates, diplomas, or achievement documents.
+
+### Contract Automation
+Generate contracts and legal documents with variable terms and conditions.
+
+### Marketing Materials
+Create personalized marketing materials, proposals, and presentations.
+
+## Ready to get started? [Create your API key](https://app.dynamopdf.com/developer) and begin building with the DynamoPDF API!

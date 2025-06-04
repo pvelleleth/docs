@@ -1,58 +1,363 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
+    "title": "Docurate PDF API",
+    "description": "Generate PDFs from JSON templates with data binding",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.dynamopdf.com",
+      "description": "Production"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Development"
     }
   ],
   "security": [
     {
-      "bearerAuth": []
+      "apiKeyAuth": []
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
+    "/api/generate-pdf": {
+      "post": {
+        "summary": "Generate PDF",
+        "tags": ["PDF"],
+        "security": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
+            "apiKeyAuth": []
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "templateId": {
+                    "type": "string",
+                    "example": "template_123"
+                  },
+                  "data": {
+                    "type": "object",
+                    "example": {
+                      "name": "John Doe",
+                      "company": "Acme Corp"
+                    }
+                  },
+                  "filename": {
+                    "type": "string",
+                    "example": "document.pdf"
+                  }
+                },
+                "required": ["templateId"]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "PDF generated successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "downloadUrl": {
+                      "type": "string",
+                      "example": "https://storage.example.com/document.pdf"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "example": "2024-01-15T23:59:59.000Z",
+                      "description": "Expiration timestamp for the download URL"
+                    },
+                    "filename": {
+                      "type": "string",
+                      "example": "document.pdf"
+                    },
+                  "size": {
+                    "type": "integer",
+                    "example": 123456,
+                    "description": "Size of the generated PDF in bytes"
+                  }
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Template not found"
+          }
+        }
+      }
+    },
+    "/api/generate-pdfs-batch": {
+      "post": {
+        "summary": "Generate Multiple PDFs (Batch)",
+        "description": "Generate multiple PDFs from different templates in a single API call",
+        "tags": ["PDF"],
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "templateId": {
+                      "type": "string",
+                      "example": "template_123"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "name": "John Doe",
+                        "company": "Acme Corp"
+                      }
+                    },
+                    "filename": {
+                      "type": "string",
+                      "example": "document1.pdf"
+                    }
+                  },
+                  "required": ["templateId"]
+                },
+                "example": [
+                  {
+                    "templateId": "template_123",
+                    "data": {
+                      "name": "John Doe",
+                      "company": "Acme Corp"
+                    },
+                    "filename": "document1.pdf"
+                  },
+                  {
+                    "templateId": "template_456",
+                    "data": {
+                      "name": "Jane Smith",
+                      "department": "Marketing"
+                    },
+                    "filename": "document2.pdf"
+                  }
+                ],
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch PDF generation completed",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Overall success if at least one PDF was generated"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Batch PDF generation completed: 2 successful, 0 failed"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "index": {
+                            "type": "integer",
+                            "example": 0,
+                            "description": "Index of the request in the original array"
+                          },
+                          "success": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "filePath": {
+                                "type": "string",
+                                "example": "user_123/document1.pdf"
+                              },
+                              "downloadUrl": {
+                                "type": "string",
+                                "example": "https://storage.example.com/document1.pdf"
+                              },
+                              "expiresAt": {
+                                "type": "string",
+                                "example": "2024-01-15T23:59:59.000Z"
+                              },
+                              "filename": {
+                                "type": "string",
+                                "example": "document1.pdf"
+                              },
+                              "size": {
+                                "type": "integer",
+                                "example": 123456
+                              }
+                            },
+                            "description": "Present when success is true"
+                          },
+                          "error": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string",
+                                "example": "TEMPLATE_NOT_FOUND"
+                              },
+                              "message": {
+                                "type": "string",
+                                "example": "Template not found"
+                              }
+                            },
+                            "description": "Present when success is false"
+                          }
+                        }
+                      }
+                    },
+                    "summary": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer",
+                          "example": 2,
+                          "description": "Total number of requests"
+                        },
+                        "successful": {
+                          "type": "integer",
+                          "example": 2,
+                          "description": "Number of successful PDF generations"
+                        },
+                        "failed": {
+                          "type": "integer",
+                          "example": 0,
+                          "description": "Number of failed PDF generations"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid array or empty array"
+          },
+          "401": {
+            "description": "Authentication failed"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/templates": {
+      "get": {
+        "summary": "List Templates",
+        "tags": ["Templates"],
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Templates list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "templates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "template_123"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "My Template"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "example": "2024-01-01T00:00:00.000Z"
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 7
+                        },
+                        "totalPages": {
+                          "type": "integer",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -60,157 +365,190 @@
         }
       },
       "post": {
-        "description": "Creates a new plant in the store",
+        "summary": "Create Template",
+        "tags": ["Templates"],
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
         "requestBody": {
-          "description": "Plant to add to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "My Template"
+                  },
+                  "template": {
+                    "type": "object",
+                    "example": {
+                      "size": {
+                        "width": 595,
+                        "height": 842
+                      },
+                      "pages": [
+                        {
+                          "elements": [
+                            {
+                              "type": "text",
+                              "content": "Hello {{data.name}}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                "required": ["name", "template"]
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "plant response",
+          "201": {
+            "description": "Template created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "template": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "template_456"
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "My Template"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
           },
           "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "description": "Invalid template data"
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/api/templates/{id}": {
+      "get": {
+        "summary": "Get Template by ID",
+        "tags": ["Templates"],
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of plant to delete",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+              "type": "string"
+            },
+            "description": "Template ID",
+            "example": "template_123"
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "Template retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "template": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "template_123"
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "My Template"
+                        },
+                        "template": {
+                          "type": "object",
+                          "description": "Template configuration object",
+                          "example": {
+                            "size": {
+                              "width": 595,
+                              "height": 842
+                            },
+                            "pages": [
+                              {
+                                "elements": [
+                                  {
+                                    "type": "text",
+                                    "content": "Hello {{data.name}}"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-01-01T00:00:00.000Z"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-01-01T00:00:00.000Z"
+                        },
+                        "user_id": {
+                          "type": "string",
+                          "example": "user_123"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
-          }
-        }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+          },
+          "401": {
+            "description": "Authentication failed"
+          },
+          "404": {
+            "description": "Template not found"
+          },
+          "500": {
+            "description": "Database error"
           }
         }
       }
     }
   },
   "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "API key for accessing the Docurate PDF API"
       }
     }
   }

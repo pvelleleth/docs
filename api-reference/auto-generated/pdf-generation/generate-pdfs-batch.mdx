@@ -1,0 +1,204 @@
+---
+title: "Generate Multiple PDFs (Batch)"
+description: "Generate multiple PDFs from different templates in a single API call with detailed result tracking"
+openapi: "post /api/generate-pdfs-batch"
+---
+
+## Overview
+
+The Generate PDFs Batch endpoint allows you to create multiple PDF documents from different templates in a single API call. This is perfect for scenarios where you need to generate many documents at once, such as bulk invoice processing, mass certificate generation, or report batching.
+
+<Info>
+Each PDF in the batch is processed individually with detailed success/failure tracking. Partial success is supported - some PDFs can succeed while others fail.
+</Info>
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Bulk Processing" icon="layer-group">
+    **Multiple Templates**
+    
+    Generate PDFs from different templates in a single request, each with unique data and filenames.
+  </Card>
+  
+  <Card title="Detailed Results" icon="list-check">
+    **Individual Tracking**
+    
+    Get detailed success/failure status for each PDF with specific error messages and download URLs.
+  </Card>
+  
+  <Card title="Partial Success" icon="shield-check">
+    **Resilient Processing**
+    
+    If some PDFs fail, successful ones are still generated and available for download.
+  </Card>
+  
+  <Card title="Efficiency" icon="bolt">
+    **Optimized Performance**
+    
+    Process multiple PDFs in a single request.
+  </Card>
+</CardGroup>
+
+## Request Structure
+
+The request body is a direct array of PDF generation requests. Each item has the same structure as the single PDF endpoint.
+
+### Basic Batch Request
+
+<CodeGroup>
+
+```json Simple Batch
+[
+  {
+    "templateId": "invoice_template_123",
+    "data": {
+      "customerName": "John Smith",
+      "invoiceNumber": "INV-001",
+      "amount": 1299.99
+    },
+    "filename": "invoice-001.pdf"
+  },
+  {
+    "templateId": "receipt_template_456", 
+    "data": {
+      "customerName": "Jane Doe",
+      "receiptNumber": "REC-001",
+      "total": 45.99
+    },
+    "filename": "receipt-001.pdf"
+  }
+]
+```
+
+</CodeGroup>
+
+### Mixed Template Batch
+
+<CodeGroup>
+
+```json Different Templates
+[
+  {
+    "templateId": "certificate_template",
+    "data": {
+      "studentName": "Alice Johnson",
+      "courseName": "Advanced JavaScript",
+      "completionDate": "2024-01-15",
+      "grade": "A+"
+    },
+    "filename": "certificate-alice-javascript.pdf"
+  },
+  {
+    "templateId": "invoice_template",
+    "data": {
+      "company": "Acme Corp",
+      "invoiceNumber": "INV-2024-001",
+      "items": [
+        {
+          "name": "Consulting",
+          "amount": 5000.00
+        }
+      ]
+    },
+    "filename": "invoice-acme-001.pdf"
+  },
+  {
+    "templateId": "report_template",
+    "data": {
+      "reportTitle": "Q1 Sales Report",
+      "quarter": "Q1 2024",
+      "totalSales": 125000
+    },
+    "filename": "q1-sales-report.pdf"
+  }
+]
+```
+
+</CodeGroup>
+
+## Response Structure
+
+The response includes detailed results for each PDF generation attempt, plus summary statistics.
+
+### Successful Batch Response
+
+<CodeGroup>
+
+```json Full Success
+{
+  "success": true,
+  "message": "Batch PDF generation completed: 2 successful, 0 failed",
+  "results": [
+    {
+      "index": 0,
+      "success": true,
+      "data": {
+        "filePath": "user_123/invoice-001.pdf",
+        "downloadUrl": "https://storage.example.com/invoice-001.pdf?token=xyz",
+        "expiresAt": "2024-01-15T23:59:59.000Z",
+        "filename": "invoice-001.pdf",
+        "size": 45678
+      }
+    },
+    {
+      "index": 1,
+      "success": true,
+      "data": {
+        "filePath": "user_123/receipt-001.pdf", 
+        "downloadUrl": "https://storage.example.com/receipt-001.pdf?token=abc",
+        "expiresAt": "2024-01-15T23:59:59.000Z",
+        "filename": "receipt-001.pdf",
+        "size": 23456
+      }
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  }
+}
+```
+
+</CodeGroup>
+
+### Partial Success Response
+
+<CodeGroup>
+
+```json Partial Success
+{
+  "success": true,
+  "message": "Batch PDF generation completed: 1 successful, 1 failed",
+  "results": [
+    {
+      "index": 0,
+      "success": true,
+      "data": {
+        "filePath": "user_123/invoice-001.pdf",
+        "downloadUrl": "https://storage.example.com/invoice-001.pdf?token=xyz",
+        "expiresAt": "2024-01-15T23:59:59.000Z",
+        "filename": "invoice-001.pdf",
+        "size": 45678
+      }
+    },
+    {
+      "index": 1,
+      "success": false,
+      "error": {
+        "code": "TEMPLATE_NOT_FOUND",
+        "message": "Template not found"
+      }
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "successful": 1,
+    "failed": 1
+  }
+}
+```
+
+</CodeGroup>
+

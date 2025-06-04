@@ -1,0 +1,251 @@
+---
+title: "Generate PDF"
+description: "Transform templates into PDFs with dynamic data binding and cloud storage"
+openapi: "post /api/generate-pdf"
+---
+
+## Overview
+
+The Generate PDF endpoint is the core functionality of DynamoPDF. It takes a template ID and dynamic data to produce a professionally formatted PDF document that's automatically stored in secure cloud storage.
+
+<Info>
+Generated PDFs are temporarily stored and accessible via secure download URLs with automatic expiration for enhanced security.
+</Info>
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Dynamic Data Binding" icon="database">
+    **Variable Substitution**
+    
+    Replace template variables with real data like customer names, invoice numbers, dates, and complex objects.
+  </Card>
+  
+  <Card title="Cloud Storage" icon="cloud">
+    **Secure File Hosting**
+    
+    Generated PDFs are automatically uploaded to secure cloud storage with time-limited download URLs.
+  </Card>
+  
+  <Card title="Custom Filenames" icon="file-pen">
+    **Flexible Naming**
+    
+    Specify custom filenames with dynamic content for better organization and identification.
+  </Card>
+  
+  <Card title="High Performance" icon="bolt">
+    **Fast Generation**
+    
+    Optimized PDF rendering engine processes documents quickly even with complex layouts.
+  </Card>
+</CardGroup>
+
+## Data Binding
+
+Template variables are replaced with actual data during PDF generation. Variables use double curly brace syntax: `{{variable_name}}`.
+
+### Simple Variable Binding
+
+<CodeGroup>
+
+```json Template Variables
+{
+  "customerName": "John Smith",
+  "invoiceNumber": "INV-001", 
+  "date": "2024-01-15",
+  "amount": 1299.99,
+  "currency": "USD"
+}
+```
+</CodeGroup>
+
+### Complex Object Binding
+
+<CodeGroup>
+
+```json Nested Data
+{
+  "data": {
+    "customer": {
+      "name": "Acme Corporation",
+      "email": "billing@acme.com",
+      "address": {
+        "street": "123 Business Ave",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001"
+      }
+    },
+    "items": [
+      {
+        "name": "Professional Service",
+        "quantity": 10,
+        "rate": 150.00,
+        "total": 1500.00
+      },
+      {
+        "name": "Consultation", 
+        "quantity": 5,
+        "rate": 200.00,
+        "total": 1000.00
+      }
+    ]
+  }
+}
+```
+
+</CodeGroup>
+
+## Common Use Cases
+
+<Tabs>
+  <Tab title="Invoice Generation">
+    ```javascript Invoice Example
+    const invoiceData = {
+      templateId: "invoice_template_123",
+      data: {
+        invoiceNumber: "INV-2024-001",
+        issueDate: "2024-01-15",
+        dueDate: "2024-02-14",
+        company: {
+          name: "Your Company Inc.",
+          address: "123 Business St, City, State 12345",
+          phone: "(555) 123-4567",
+          email: "billing@yourcompany.com"
+        },
+        client: {
+          name: "Client Corporation", 
+          address: "456 Client Ave, Client City, CC 67890",
+          email: "ap@clientcorp.com"
+        },
+        lineItems: [
+          {
+            description: "Web Development Services",
+            hours: 40,
+            rate: 125.00,
+            amount: 5000.00
+          },
+          {
+            description: "Design Consultation",
+            hours: 8, 
+            rate: 150.00,
+            amount: 1200.00
+          }
+        ],
+        subtotal: 6200.00,
+        tax: 496.00,
+        total: 6696.00
+      },
+      filename: "invoice-INV-2024-001.pdf"
+    };
+
+    const response = await fetch('https://api.dynamopdf.com/api/generate-pdf', {
+      method: 'POST',
+      headers: {
+        'x-api-key': api_key,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(invoiceData)
+    });
+    ```
+  </Tab>
+  
+  <Tab title="Report Generation">
+    ```python Report Example
+    import requests
+    from datetime import datetime
+
+    report_data = {
+        "templateId": "monthly_report_template",
+        "data": {
+            "reportTitle": "Monthly Sales Report",
+            "reportDate": datetime.now().strftime("%B %Y"),
+            "generatedOn": datetime.now().isoformat(),
+            "metrics": {
+                "totalSales": 125000.50,
+                "transactionCount": 342,
+                "averageOrderValue": 365.50,
+                "topRegion": "North America"
+            },
+            "salesData": [
+                {"month": "January", "sales": 95000, "growth": "5.2%"},
+                {"month": "February", "sales": 108000, "growth": "8.1%"},
+                {"month": "March", "sales": 125000, "growth": "12.3%"}
+            ],
+            "charts": {
+                "salesTrend": "base64_encoded_chart_image",
+                "regionBreakdown": "base64_encoded_pie_chart"
+            }
+        },
+        "filename": f"sales-report-{datetime.now().strftime('%Y-%m')}.pdf"
+    }
+
+    response = requests.post(
+        'https://api.dynamopdf.com/api/generate-pdf',
+        headers={
+            'x-api-key': api_key,
+            'Content-Type': 'application/json'
+        },
+        json=report_data
+    )
+    ```
+  </Tab>
+  
+  <Tab title="Certificate Generation">
+    ```go Certificate Example
+    package main
+
+    import (
+        "bytes"
+        "encoding/json"
+        "net/http"
+        "time"
+    )
+
+    type CertificateData struct {
+        TemplateID string `json:"templateId"`
+        Data       struct {
+            StudentName    string `json:"studentName"`
+            CourseName     string `json:"courseName"`
+            CompletionDate string `json:"completionDate"`
+            InstructorName string `json:"instructorName"`
+            CertificateID  string `json:"certificateId"`
+            Duration       string `json:"duration"`
+            Grade          string `json:"grade"`
+        } `json:"data"`
+        Filename string `json:"filename"`
+    }
+
+    func generateCertificate(studentName, courseName string) error {
+        certData := CertificateData{
+            TemplateID: "certificate_template_456",
+            Filename:   fmt.Sprintf("certificate-%s-%s.pdf", 
+                       strings.ReplaceAll(studentName, " ", "-"),
+                       time.Now().Format("2006-01-02")),
+        }
+        
+        certData.Data.StudentName = studentName
+        certData.Data.CourseName = courseName
+        certData.Data.CompletionDate = time.Now().Format("January 2, 2006")
+        certData.Data.InstructorName = "Dr. Jane Smith"
+        certData.Data.CertificateID = fmt.Sprintf("CERT-%d", time.Now().Unix())
+        certData.Data.Duration = "40 hours"
+        certData.Data.Grade = "A+"
+        
+        jsonData, _ := json.Marshal(certData)
+        
+        req, _ := http.NewRequest("POST", 
+            "https://api.dynamopdf.com/api/generate-pdf", 
+            bytes.NewBuffer(jsonData))
+        req.Header.Set("x-api-key", apiKey)
+        req.Header.Set("Content-Type", "application/json")
+        
+        client := &http.Client{}
+        resp, err := client.Do(req)
+        
+        return err
+    }
+    ```
+  </Tab>
+</Tabs>
+
