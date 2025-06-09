@@ -9,10 +9,6 @@
     {
       "url": "https://api.curatepdf.com",
       "description": "Production"
-    },
-    {
-      "url": "http://localhost:3000",
-      "description": "Development"
     }
   ],
   "security": [
