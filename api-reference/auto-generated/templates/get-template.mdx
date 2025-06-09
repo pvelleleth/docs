@@ -65,12 +65,12 @@ The response contains the complete template object with all configuration detail
 <CodeGroup>
 
 ```bash cURL
-curl -X GET "https://api.dynamopdf.com/api/templates/template_123abc" \
+curl -X GET "https://api.curatepdf.com/api/templates/template_123abc" \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.dynamopdf.com/api/templates/template_123abc', {
+const response = await fetch('https://api.curatepdf.com/api/templates/template_123abc', {
   method: 'GET',
   headers: {
     'x-api-key': 'YOUR_API_KEY'
@@ -84,7 +84,7 @@ console.log('Template:', result.template);
 ```python Python
 import requests
 
-url = "https://api.dynamopdf.com/api/templates/template_123abc"
+url = "https://api.curatepdf.com/api/templates/template_123abc"
 headers = {
     "x-api-key": "YOUR_API_KEY"
 }
@@ -98,7 +98,7 @@ print(f"Template Name: {template_data['template']['name']}")
 ```php PHP
 <?php
 $templateId = 'template_123abc';
-$url = "https://api.dynamopdf.com/api/templates/{$templateId}";
+$url = "https://api.curatepdf.com/api/templates/{$templateId}";
 
 $headers = [
     'x-api-key: YOUR_API_KEY'
@@ -129,7 +129,7 @@ import (
 
 func main() {
     templateID := "template_123abc"
-    url := fmt.Sprintf("https://api.dynamopdf.com/api/templates/%s", templateID)
+    url := fmt.Sprintf("https://api.curatepdf.com/api/templates/%s", templateID)
     
     req, _ := http.NewRequest("GET", url, nil)
     req.Header.Add("x-api-key", "YOUR_API_KEY")

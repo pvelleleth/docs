@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "maple",
-  "name": "DynamoPDF",
+  "name": "CuratePDF",
   "colors": {
     "primary": "#0D9373",
     "light": "#07C983",
@@ -55,19 +55,19 @@
     "links": [
       {
         "label": "Dashboard",
-        "href": "https://app.dynamopdf.com"
+        "href": "https://app.curatepdf.com"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Get API Key",
-      "href": "https://app.dynamopdf.com/developer"
+      "href": "https://app.curatepdf.com/developer"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/dynamopdf",
-      "linkedin": "https://www.linkedin.com/company/dynamopdf"
+      "x": "https://x.com/curatepdf",
+      "linkedin": "https://www.linkedin.com/company/curatepdf"
     }
   }
 }

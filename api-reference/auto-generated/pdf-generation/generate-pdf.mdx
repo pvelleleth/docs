@@ -6,7 +6,7 @@ openapi: "post /api/generate-pdf"
 
 ## Overview
 
-The Generate PDF endpoint is the core functionality of DynamoPDF. It takes a template ID and dynamic data to produce a professionally formatted PDF document that's automatically stored in secure cloud storage.
+The Generate PDF endpoint is the core functionality of CuratePDF. It takes a template ID and dynamic data to produce a professionally formatted PDF document that's automatically stored in secure cloud storage.
 
 <Info>
 Generated PDFs are temporarily stored and accessible via secure download URLs with automatic expiration for enhanced security.
@@ -139,7 +139,7 @@ Template variables are replaced with actual data during PDF generation. Variable
       filename: "invoice-INV-2024-001.pdf"
     };
 
-    const response = await fetch('https://api.dynamopdf.com/api/generate-pdf', {
+    const response = await fetch('https://api.curatepdf.com/api/generate-pdf', {
       method: 'POST',
       headers: {
         'x-api-key': api_key,
@@ -181,7 +181,7 @@ Template variables are replaced with actual data during PDF generation. Variable
     }
 
     response = requests.post(
-        'https://api.dynamopdf.com/api/generate-pdf',
+        'https://api.curatepdf.com/api/generate-pdf',
         headers={
             'x-api-key': api_key,
             'Content-Type': 'application/json'
@@ -235,7 +235,7 @@ Template variables are replaced with actual data during PDF generation. Variable
         jsonData, _ := json.Marshal(certData)
         
         req, _ := http.NewRequest("POST", 
-            "https://api.dynamopdf.com/api/generate-pdf", 
+            "https://api.curatepdf.com/api/generate-pdf", 
             bytes.NewBuffer(jsonData))
         req.Header.Set("x-api-key", apiKey)
         req.Header.Set("Content-Type", "application/json")

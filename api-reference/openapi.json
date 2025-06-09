@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://api.dynamopdf.com",
+      "url": "https://api.curatepdf.com",
       "description": "Production"
     },
     {
